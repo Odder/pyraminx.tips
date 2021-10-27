@@ -4,6 +4,19 @@
   <script>window.addEventListener("load", () => {
     document.querySelector("twisty-player").experimentalModel.playingInfoProp.set({playing: true, loop: true})
     })</script>
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: #EEE;
+    }
+    
+    twisty-player {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 <body>
   <twisty-player puzzle="pyraminx" alg="(u l r b)3" tempo-scale=3 control-panel="none" background="none" camera-longitude="40"></twisty-player>
