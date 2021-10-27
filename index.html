@@ -1,0 +1,10 @@
+<head>
+  <title>Pyraminx tips!</title>
+  <script src="https://cdn.cubing.net/js/cubing/twisty" type="module" defer></script>
+  <script>window.addEventListener("load", () => {
+    document.querySelector("twisty-player").experimentalModel.playingInfoProp.set({playing: true, loop: true})
+    })</script>
+</head>
+<body>
+  <twisty-player puzzle="pyraminx" alg="(u l r b)3" tempo-scale=3 control-panel="none" background="none" camera-longitude="40"></twisty-player>
+</head>
