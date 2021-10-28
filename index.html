@@ -1,9 +1,5 @@
 <head>
   <title>Pyraminx tips!</title>
-  <script src="https://cdn.cubing.net/js/cubing/twisty" type="module" defer></script>
-  <script>window.addEventListener("load", () => {
-    document.querySelector("twisty-player").experimentalModel.playingInfoProp.set({playing: true, loop: true})
-    })</script>
   <style>
     html, body {
       width: 100%;
@@ -17,7 +13,51 @@
       height: 100%;
     }
   </style>
+  <script type="module">
+    import { TwistyPlayer } from "https://cdn.cubing.net/js/cubing/twisty"
+
+    const generateScramble = function (numberOfMoves) {
+      const moves = ['u', 'l', 'r', 'b']
+      const directions = ['', "'"]
+      let state = [1, 0, 0, 0]
+      let scramble = '. . '
+      let move = 0
+      let prevMove = -1
+      let direction = 0
+      let r = 0
+      for (let i = 0; i < numberOfMoves; i++) {
+        r = ~~(Math.random() * 8)
+        move = r % 4
+        move = prevMove == move ? (move + 1) % 4 : move
+        prevMove = move
+        direction = ~~(r / 4) % 2
+        state[move] += direction ? 2 : 1
+        state[move] %= 3
+        if (state == [0, 0, 0, 0]) {
+          state[move] += direction ? 2 : 1
+          state[move] %= 3
+          direction = direction ? 0 : 1
+        }
+        scramble += moves[move] + directions[direction] + ' '
+      }
+      return scramble
+    }
+
+    const player = new TwistyPlayer({
+      puzzle: "pyraminx",
+      alg: generateScramble(1000),
+      experimentalSetupAlg: "u",
+      tempoScale: "2",
+      cameraLongitude: "40",
+      cameraDistance: "7",
+      controlPanel: "none",
+      background: "none",
+    });
+    player.experimentalModel.playingInfoProp.set({playing: true, loop: true})
+    document.body.appendChild(player)
+  </script>
 </head>
 <body>
-  <twisty-player puzzle="pyraminx" alg="(u l r b)3" tempo-scale=3 control-panel="none" background="none" camera-longitude="40"></twisty-player>
+
+</body>
 </head>
