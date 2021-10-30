@@ -16,36 +16,76 @@
   <script type="module">
     import { TwistyPlayer } from "https://cdn.cubing.net/js/cubing/twisty"
 
-    const generateScramble = function (numberOfMoves) {
+    let scramble = '. . '
+
+    const randInt = (min, max) => {
+      return ~~(Math.random() * (max-min) + min)
+    }
+
+    const applyMove = (state, move, direction) => {
+      state[move] += direction ? 2 : 1
+      state[move] %= 3
+      return state
+    }
+
+    const moveString = (move, direction) => {
       const moves = ['u', 'l', 'r', 'b']
       const directions = ['', "'"]
+      return moves[move] + directions[direction] + ' '
+    }
+
+    const generateScramble = numberOfMoves => {
+      const solved = [0, 0, 0, 0]
+      const setup = [1, 0, 0, 0]
       let state = [1, 0, 0, 0]
       let scramble = '. . '
       let move = 0
-      let prevMove = -1
+      let prevMove = 0
       let direction = 0
       let r = 0
+      let offset = 0
       for (let i = 0; i < numberOfMoves; i++) {
-        r = ~~(Math.random() * 8)
+        r = randInt(0, 8)
         move = r % 4
-        move = prevMove == move ? (move + 1) % 4 : move
+        move = prevMove == move ? (move + randInt(1,4)) % 4 : move
         prevMove = move
         direction = ~~(r / 4) % 2
-        state[move] += direction ? 2 : 1
-        state[move] %= 3
-        if (state == [0, 0, 0, 0]) {
-          state[move] += direction ? 2 : 1
-          state[move] %= 3
+        state = applyMove(state, move, direction)
+        if (state.every(num => num === 0)) {
+          state = applyMove(state, move, direction)
           direction = direction ? 0 : 1
         }
-        scramble += moves[move] + directions[direction] + ' '
+        scramble += moveString(move, direction)
+      }
+      for (let i = 0; i < 4; i++) {
+        let isDistraction = false
+        let alternativeMove = -1
+        let alternativeDirection = -1
+        if (state[i] !== setup[i]) {
+          if (prevMove == i) {
+            let alternativeMove = state.findIndex((x, j) => i !== j && x !== setup[j])
+            let isDistraction = alternativeMove === -1
+            alternativeMove = !isDistraction ? alternativeMove : (i < 3 ? 3 : 2)
+            alternativeDirection = state[alternativeMove] == ((setup[alternativeMove] + 2) % 2) ? 1 : 0
+            state = applyMove(state, alternativeMove, alternativeDirection)
+            scramble += moveString(alternativeMove, alternativeDirection)
+          }
+          direction = state[i] == ((setup[i] + 1) % 3) ? 1 : 0
+          state = applyMove(state, i, direction)
+          scramble += moveString(i, direction)
+          prevMove = i
+          if (isDistraction) {
+            state = applyMove(alternativeMove, (alternativeDirection + 1) % 2)
+            scramble += moveString(alternativeMove, (alternativeDirection + 1) % 2)
+          }
+        }
       }
       return scramble
     }
 
     const player = new TwistyPlayer({
       puzzle: "pyraminx",
-      alg: generateScramble(1000),
+      alg: generateScramble(100),
       experimentalSetupAlg: "u",
       tempoScale: "2",
       cameraLongitude: "40",
